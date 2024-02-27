@@ -12,7 +12,8 @@ const errorMsg = document.getElementById('error-msg');
 const form = document.getElementsByTagName('form')[0];
 
 function updateCounter() {
-  document.getElementById('count').innerText = notes.length;
+  const countElem = document.getElementById('count');
+  countElem.innerText = notes.length;
 }
 
 function addNoteToModel() {
@@ -33,6 +34,7 @@ function addNoteToView() {
 function addNote() {
   addNoteToModel();
   addNoteToView();
+  updateCounter();
 }
 
 function resetInput() {
@@ -63,6 +65,20 @@ inputElem.addEventListener('change', function (event) {
   }
 });
 
+let noteCount = 0;
+function updateNoteCount(inputElem) {
+  if (inputElem !== "") {
+    noteCount++;
+  } else {
+    noteCount = 0;
+  }
+  document.getElementById('count').textContent = noteCount;
+}
+
+window.onload = function() {
+  updateNoteCount("");
+};
+
 // gérer la soumission du formulaire.
 form.addEventListener('submit', async function (event) {
   // empêcher le rechargement de la page(comportement par défaut d'un form)
@@ -76,6 +92,7 @@ form.addEventListener('submit', async function (event) {
     await refreshNote();
     // updateCounter();
     resetInput();
+    updateNoteCount();
   }
 });
 
@@ -105,3 +122,13 @@ async function refreshNote() {
 }
 
 refreshNote();
+
+listElem.addEventListener('click', async event => {
+  if (event.target.tagName === 'BUTTON') {
+    const id = event.target.getAttribute('data-id');
+    if (id) {
+      await NoteManager.remove(id);
+      await NoteManager.refreshNote();
+    }
+  }
+});
